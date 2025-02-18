@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReportBro Integration with Custom Dropdown</title>
+    <!-- Link to ReportBro's CSS -->
+    <link rel="stylesheet" href="dist/reportbro.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Optional: Include any additional CSS here -->
+
+    <style type="text/css">
+      @font-face {
+        font-family: "dejavusans";
+        src: url("fonts/DejaVuSans.ttf");
+      }
+      @font-face {
+        font-family: "purisa";
+        src: url("fonts/Purisa.ttf");
+      }
+      @font-face {
+        font-family: "freesans";
+        src: url("fonts/FreeSans.ttf");
+      }
+      .ql-font-dejavusans {
+        font-family: "dejavusans";
+      }
+      .ql-font-purisa {
+        font-family: "purisa";
+      }
+      .ql-font-freesans {
+        font-family: "freesans";
+      }
+    </style>
+    <link rel="stylesheet" href="custom.css" />
+  </head>
+  <body>
+    <div id="app-container">
+      <!-- ReportBro Application -->
+      <div id="reportbro"></div>
+
+      <!-- Footer with Save, Load buttons and Custom Select menu -->
+      <div id="footer">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <input
+            type="text"
+            name="templateNameInput"
+            id="templateNameInput"
+            value="-- Nová šablona --"
+          />
+          <button type="button" class="archive-button" id="archive-button">
+            Archivovat
+          </button>
+        </div>
+
+        <div
+          style="display: flex; align-items: center; justify-content: center"
+        >
+          <button id="savenew-button" class="footer-button">
+            <i class="rbroIcon-save"></i> Uložit jako nové
+          </button>
+          <button id="save-button" class="footer-button">
+            <i class="rbroIcon-save"></i> Uložit
+          </button>
+          <button id="load-popup" class="footer-button">
+            <i class="rbroIcon-insert-report"></i> Vyber šablonu
+          </button>
+          <button id="sql-button" class="footer-button">
+            <i class="rbroIcon-load"></i> SQL Editor
+          </button>
+        </div>
+        <button id="help-button" class="help-button">
+          <i class="rbroIcon-info"></i> Nápověda
+        </button>
+      </div>
+      <div id="help-overlay" class="help-overlay"></div>
+
+      <!-- Help Popup -->
+      <div id="help-popup" class="help-popup">
+        <div class="help-popup-header">
+          <h1 class="help-popup-title">Centrum nápovědy</h1>
+          <span class="help-close-button">&times;</span>
+        </div>
+        <div class="help-popup-content">
+          <!-- Vložte svůj obsah nápovědy zde -->
+          <h1>Návod k použití softwaru pro vytváření PDF šablon</h1>
+          <h2>Úvod</h2>
+          <p>
+            Tento software umožňuje vytvářet PDF šablony pomocí grafického
+            rozhraní. Umožňuje vkládat dynamická data prostřednictvím
+            proměnných.
+          </p>
+
+          <h2>Vytváření a ukládání šablon</h2>
+          <p>Pro práci se šablonami slouží následující tlačítka:</p>
+          <ul>
+            <li>
+              <strong>Uložit jako nové</strong>: Uloží aktuální šablonu pod
+              novým názvem. Při prvním uložení nové šablony použijte toto
+              tlačítko.
+            </li>
+            <li>
+              <strong>Uložit</strong>: Uloží změny do aktuálně načtené šablony.
+              Ujistěte se, že máte načtenou šablonu, kterou chcete upravit.
+            </li>
+            <li>
+              <strong>Vyber šablonu</strong>: Otevře seznam existujících šablon
+              pro načtení. Vyberte šablonu ze seznamu a klikněte na
+              <strong>Načíst</strong>.
+            </li>
+          </ul>
+
+          <h2>Práce s proměnnými</h2>
+          <p>
+            Proměnné umožňují vkládat dynamická data do šablon. Mohou být
+            napojeny na sloupce z výsledků SQL dotazu. Proměnné různých typů
+            mají různé schopnosti, proto je důležité vybrat správný typ podle
+            potřeby.
+          </p>
+          <p>
+            Proměné musí mít totožný název se sloupci v tabulce získané SQL
+            dotazem, aby se mohli přiřadit
+          </p>
+          <p>
+            Proměné jsou v designeru používány ve formátu
+            <code>${proměnná}</code>.
+          </p>
+          <h3>Minimální znalost SQL</h3>
+          <p>
+            Pro efektivní využití proměnných je potřeba alespoň základní znalost
+            SQL, abyste mohli vytvářet dotazy a pracovat s daty z databáze.
+          </p>
+
+          <h2>Editor SQL dotazů</h2>
+          <p>
+            Tlačítko <strong>SQL Editor</strong> otevře okno pro úpravu a
+            testování SQL dotazů.
+          </p>
+          <p>V editoru můžete:</p>
+          <ul>
+            <li>
+              Zadat SQL dotaz, který bude použit pro získání dat pro šablonu.
+            </li>
+            <li>
+              V SQL dotazu zadávejte parametry ve formátu @param1, @param2 atd.
+            </li>
+
+            <li>
+              Otestovat dotaz kliknutím na tlačítko <strong>Test</strong>.
+              Výsledky se zobrazí v tabulce pod editorem.
+            </li>
+            <li>
+              Pro učely testování musíte zadat skutečné paramety které SQL dotaz
+              použije a to ve formátu <code>[param0, param1, ...] </code>
+            </li>
+          </ul>
+
+          <h2>Použití dynamických tabulek</h2>
+          <p>Pro vytvoření dynamické tabulky je třeba:</p>
+          <ul>
+            <li>Vytvořit proměnnou typu <strong>list</strong> v šabloně.</li>
+            <li>Napojit tuto proměnnou na SQL dotaz v editoru SQL.</li>
+          </ul>
+          <p>
+            Tabulka pak automaticky vygeneruje řádek pro každý záznam z výsledků
+            SQL dotazu.
+          </p>
+
+          <h2>Generování platebního QR kódu</h2>
+          <p>
+            Software obsahuje funkci pro generování QR kódů ve specifickém
+            formátu:
+          </p>
+          <p>
+            <code
+              >SPD*1.0*ACC:${IBAN}*AM:${KcCelkem}*CC:${Mena}*MSG:PLATBA ZA
+              OBJEDNAVKU
+              ${CisloObj}*X-VS:${VarSym}*X-KS:${KonstSym}*DT:${DatumQR}</code
+            >
+            <a href="https://qr-platba.cz/pro-vyvojare/specifikace-formatu/"
+              >Specifikace Formátu</a
+            >
+          </p>
+          <p>
+            Proměnné musí mít stejné názvy jako sloupce v SQL dotazu, aby byly
+            správně nahrazeny daty.
+          </p>
+
+          <h2>Testování SQL dotazů</h2>
+          <p>
+            V editoru SQL můžete testovat své dotazy před jejich použitím v
+            šabloně. Po zadání dotazu a případných parametrů klikněte na
+            <strong>Test</strong> a výsledky se zobrazí v tabulce. To vám pomůže
+            ověřit, že dotaz vrací očekávaná data.
+          </p>
+          <h2>Archivace</h2>
+          <p>
+            Funkce archivace zneaktivní šablonu pro generování, v editoru je ale
+            stále viditelná. Je možno ji obnovit. Při archivaci se uloží
+            stávající stav šablony.
+          </p>
+          <h2>Oficiální dokumentace pro ReportBro Designer</h2>
+          <ul>
+            <li>
+              <a href="https://www.reportbro.com/doc/userguide"
+                >Návod na obsluhu Designeru</a
+              >
+            </li>
+            <li>
+              <a href="https://www.reportbro.com/framework/api"
+                >API dokumentace</a
+              >
+            </li>
+          </ul>
+
+          <h2>Závěr</h2>
+          <p>
+            Tento software vám umožní snadno vytvářet PDF šablony s dynamickým
+            obsahem. S pomocí proměnných a základních znalostí SQL můžete
+            vytvářet přizpůsobené dokumenty rychle a efektivně. Můžete se
+            inspirovat již vytvořenýma šablonama
+          </p>
+          <p>Můžete se inspirovat již vytvořenýma šablonama</p>
+          <br /><br /><br />
+        </div>
+      </div>
+
+      <div id="popup-overlay">
+        <div id="popup-content">
+          <h2 class="ql-font-dejavusans ql-font-freesans ql-font-purisa">
+            Vyber šablonu k načtení
+          </h2>
+          <select name="templates" id="template-select"></select>
+          <div class="load-buttons">
+            <div class="checkbox-container">
+              <input
+                type="checkbox"
+                name="archive-display-switch"
+                id="archive-display-switch"
+              />
+              <label for="archive-display-switch" id="archive-display-label"
+                >Archivované</label
+              >
+            </div>
+            <button id="close-popup" class="footer-button">Zavřít</button>
+            <button id="load-button" class="footer-button">Načíst</button>
+          </div>
+        </div>
+      </div>
+      <div id="sql-popup-overlay">
+        <div id="sql-popup-content">
+          <h2 class="ql-font-dejavusans ql-font-freesans ql-font-purisa">
+            SQL Editor:
+          </h2>
+          <textarea
+            name="sql-textarea"
+            id="sql-textarea"
+            cols="60"
+            rows="20"
+          ></textarea>
+
+          <input
+            type="text"
+            name="param"
+            id="param-text"
+            placeholder="[@param0, @param1, ...]"
+          />
+          <div class="scrollable-table">
+            <table id="dynamicTable">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="load-buttons">
+            <button id="close-sql" class="footer-button">Zavřít</button>
+            <button id="test-sql" class="footer-button">Test</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Include ReportBro's JavaScript -->
+    <script src="dist/reportbro.js"></script>
+    <!-- Include your custom JavaScript below -->
+    <script type="text/javascript" src="scripts/saveTemplate.js"></script>
+    <script type="text/javascript" src="scripts/loadTemplate.js"></script>
+    <script type="text/javascript" src="scripts/testsql.js"></script>
+    <script type="text/javascript" src="scripts/script.js"></script>
+  </body>
+</html>

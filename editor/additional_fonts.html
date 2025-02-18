@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ReportBro Font Demo</title>
+    <meta charset="utf-8" />
+    <link href="dist/reportbro.css" rel="stylesheet" type="text/css" />
+    <script src="dist/reportbro.js"></script>
+
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+
+    <style>
+      @font-face {
+        font-family: "dejavusans";
+        src: url("./fonts/DejaVuSans.ttf");
+      }
+
+      .ql-font-dejavusans {
+        font-family: "dejavusans";
+      }
+      .ql-font-firefly {
+        font-family: "firefly";
+      }
+    </style>
+  </head>
+  <body>
+    <div id="reportbro"></div>
+    <p class="ql-font-dejavusans"></p>
+    <script type="text/javascript">
+      const rb = new ReportBro(document.getElementById("reportbro"), {
+        additionalFonts: [{ name: "DejaVu", value: "dejavusans" }],
+      });
+    </script>
+  </body>
+</html>
